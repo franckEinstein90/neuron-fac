@@ -1,11 +1,47 @@
 <html>
 <head>
 	<title>Neuron-Fac Project</title>
+
+<!--  AUI Core -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script src="https://aui-cdn.atlassian.com/aui-adg/6.0.9/js/aui.min.js"></script>
+<link rel="stylesheet" href="https://aui-cdn.atlassian.com/aui-adg/6.0.9/css/aui.min.css" media="all">
+
+<!-- AUI Experimental components -->
+<link rel="stylesheet" href="https://aui-cdn.atlassian.com/aui-adg/6.0.9/css/aui-experimental.min.css" media="all">
+<script src="https://aui-cdn.atlassian.com/aui-adg/6.0.9/js/aui-experimental.min.js"></script>
+
+<!-- AUI Datepicker and Soy templates -->
+<script src="https://aui-cdn.atlassian.com/aui-adg/6.0.9/js/aui-datepicker.min.js"></script>
+<script src="https://aui-cdn.atlassian.com/aui-adg/6.0.9/js/aui-soy.min.js"></script>
 </head>
 
 
 <body>
 	<h1>Welcome to Neuron-Fac</h1>
+    <form class="aui">
+        <div class="field-group">
+            <label for="A">A</label>
+            <input class="text medium-field" type="text" name="A" id="A">
+            <div class="description">The value of A</div>
+        </div>
+        <div class="field-group">
+            <label for="B">B</label>
+            <input class="text medium-field" type="text" name="B" id="B">
+            <div class="description">The value of B</div>
+        </div>
+        <div class="buttons-container">
+            <div class="buttons">
+                <input class="button"  value="execute" id="exec">
+            </div>
+        </div>
+         <div class="field-group">
+            <label for="result">result</label>
+            <input class="text medium-field" type="text" id="result" name="result">
+        </div>
+        
+    </form>
+    <script src="bundle.js"></script>
 </body>
 
 </html>
