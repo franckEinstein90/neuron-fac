@@ -7,15 +7,14 @@
  * ****************************************/
 
 const types = require('./types.js').types;
-const plugs = require('./plugs.js').plugs;
 
-const connectors  = (function(){
+const connectors = (function(){
 
-       return{
-            Connector : function({left, right}){
-                this.left = left;
-                this.right = right;
-                this.type = types.getType({left, right});
+    return{
+        Connector : function({left, right}){
+            this.leftNode = left,
+            this.rightNode = right,
+            this.type = left.type(right)
             }
         }
 })();
