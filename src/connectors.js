@@ -12,11 +12,13 @@ const connectors = (function(){
 
     return{
         Connector : function({left, right}){
-            this.leftNode = left,
-            this.rightNode = right,
-            this.type = left.type(right)
+            this.leftNode = left;
+            this.rightNode = right;
+            this.type = function(){
+                return left.type(right)
             }
         }
+    }
 })();
 
 connectors.Connector.prototype = {
