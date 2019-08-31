@@ -31,18 +31,19 @@ describe('Plug', function(){
 })
 
 describe("Type", function(){
-    it('is an object created using the types.add function', function(){
+    it('is created using the types.add function', function(){
         let BOOL = types.add({typeName:"BOOL", typeSignature:[,,,]});
         expect(BOOL).to.be.an('object');
-        expect(BOOL).to.be.an.instanceof(types.Type);
+        expect(BOOL).to.be.an.instanceof(types.Type)
+
+        //can't create an object as below
+        //throws "sorry, types.Type objects can only 
+        //be created through the 'types.add' function"
+        let ACTION = new types.Type({typeName:"NUM"})
     })
 
-    it('is has unique ID', function(){
-
-    })
-
-    it('is a set of TypedObjects', function (){
-        let BOOL = new types.Type({typeName:"BOOL", typeSignature:[,,,]});
+   it('is a set of TypedObjects', function (){
+        let BOOL = new types.add({typeName:"BOOL", typeSignature:[,,,]});
         expect(1).to.equal(1);
     })
 
@@ -58,8 +59,19 @@ describe("Type", function(){
         expect(BOOL).to.haveOwnProperty('type');
     })
 
+    it('will not create a new type with the same typeName', function(){
+
+
+    })
 })
 
+describe("type.Type.uuid", function(){
+   it('has a unique ID, formatted in the uuid v4 format', function(){
+        let COLOR = types.add({typeName:"COLOR"})
+
+    })
+}) 
+ 
 describe("types.Type.type( arguments )", function(){
 
     it ("is a function", function(){
