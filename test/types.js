@@ -1,6 +1,6 @@
 "use strict";
 
-const types = require('../src/types').types;
+const types = require('../src/types/types').types;
 const expect = require('chai').expect; 
 
 describe("TypeSignature Object", function(){

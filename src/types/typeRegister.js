@@ -1,6 +1,5 @@
 const assert = require('chai').assert;
 const deepEql = require('deep-eql');
-const color = require("tinycolor2");
 
 const typeRegister = (function(){
 
