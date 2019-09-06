@@ -15,6 +15,7 @@
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "tinycolor2": "^1.4.1",
-    "uuid": "^3.3.3"
+    "uuid": "^3.3.3",
+    "watchify": "^3.11.1"
   }
 }

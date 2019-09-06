@@ -30,9 +30,9 @@ describe('Plug', function(){
     })
 })
 
-describe("Type", function(){
+describe("types.Type Object", function(){
     it('is created using the types.add function', function(){
-        let BOOL = types.add({typeName:"BOOL", typeSignature:[,,,]});
+        let BOOL = types.add({typeName:"BOOL", typeSignature:X => [X,X,X]})
         expect(BOOL).to.be.an('object');
         expect(BOOL).to.be.an.instanceof(types.Type)
 

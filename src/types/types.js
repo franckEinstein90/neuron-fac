@@ -5,8 +5,10 @@
  *
  * ****************************************/
 const assert = require('chai').assert;
+const expect = require('chai').expect;
 const equal = require('deep-equal'); 
-const typeRegister = require('./typeRegister').typeRegister;
+const typeSignatures = require('./typeSignatures').typeSignatures
+const typeRegister = require('./typeRegister').typeRegister
 
 const types = (function(){
 
@@ -36,16 +38,7 @@ const types = (function(){
         };
 
     return{
-        TypeSignature : function(typeSignatureDefinition){
-            /***********************************
-             * - An Atomic type is a name for a set of elements
-             * - A TypeAbstraction is a function that takes a type
-             *   and returns a type
-             * - 
-             */
-
-        },
-        typeResolve : function({leftType, rightType}){
+       typeResolve : function({leftType, rightType}){
 
         },
         compareTypeSignature: function(left, right){
@@ -59,9 +52,30 @@ const types = (function(){
                     typeSignature[0] !== undefined &&
                     typeSignature[1] !== undefined; 
         },
-        add: function(options){
+        add: function({typeName, typeSignature}){
             //Adds a new type to the universe
-            if (options.typeSignature !== undefined){
+            let signature, registerIndex
+            expect(typeSignature).to.be.defined
+
+            if(Array.isArray(typeSignature) || typeof typeSignature === 'function'){
+                signature = new typeSignatures.TypeSignature(typeSignature)    
+            }
+            else {
+                expect(typeSignature).to.be.an.instanceOf(typeSignatures.TypeSignature)
+                signature = typeSignature
+            }
+
+            registerIndex = typeRegister.get(signature)
+            if(registerIndex) { //this signature already exists in the register
+                typeRegister.addAlias({alias:typeName, signature})
+                return new types.Type(
+                    {   typeName, 
+                        typeSignature:typeRegister.getContextSignature(registerIndex)
+                    })  
+                }
+            }
+ 
+                if(typeof signature === )
                 if (options.leftType !== undefined && options.rightType !== undefined){
                     //do nothing, handled later
                 }
@@ -100,7 +114,7 @@ const types = (function(){
          ***********************************************************************/
          Type : function ({typeName, typeSignature}){
             if (typeSignature === undefined) {
-                 typeSignature = [];
+                 typeSignature = []; //add a new atomic type
                 }
             try{
                 this.elements = [];

@@ -1,0 +1,29 @@
+
+
+  typeSignature module implementation
+    √ Includes a constructor for an object called 'TypeSignature'
+    √ includes a function compare
+    √ includes a function combine
+
+  typeSignatures.TypeSignature object
+    It takes a description as its only parameter.
+      √ the descritpion can be an array
+      √ the description can be a function
+      √ recognizes arrow types
+      √ recognizes abstract types
+
+  typeSignatures.compare(tsLeft, tsRight)
+    √ simple equality
+    √ resolves left to right
+    √ ...
+    √ ABSTRACT 2...
+    √ ...
+
+  typeSignatures::typeSignature.combine(ts1, ts2)
+    √ takes two signatures as arguments
+    √ combines [A->B A] to B
+    √ combines [TTX.X->X->X A] to A->A->A
+
+
+  15 passing (68ms)
+

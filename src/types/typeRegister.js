@@ -1,5 +1,7 @@
-const assert = require('chai').assert;
-const deepEql = require('deep-eql');
+const expect = require('chai').expect
+const assert = require('chai').assert
+const deepEql = require('deep-eql')
+const typeSignatures = require('./typeSignatures').typeSignatures
 
 const typeRegister = (function(){
 
@@ -33,7 +35,10 @@ const typeRegister = (function(){
     return{
 
         add : function({alias, signature}){
-           let id = newID(alias);
+            expect(alias).to.be.a('string')
+            expect(signature).to.be.an.instanceof(typeSignatures.TypeSignature)
+
+            let id = newID(alias);
            names.push({alias, id});
            if(eql(signature, [])) { atomicTypes.push(alias); }
            else{
