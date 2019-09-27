@@ -4,49 +4,91 @@
 
  "use strict";
 
-const typeSignatures = require('../src/types/typeSignatures').typeSignatures;
+const typeSignatures = require('../../src/types/typeSignatures').typeSignatures;
 const expect = require('chai').expect; 
 
 
 
 describe("typeSignature module implementation", function(){
-    it("Includes a constructor for an object called 'TypeSignature'", function(){
+    context("TypeSignature object", function(){
+        it("is constructed through the typeSignatures.signature function", function(){
+           let ts = typeSignatures.signature({context: "", typeDescription:["NUM"]}) 
+           expect(ts).to.be.an('object')
+           expect(ts).to.be.an.instanceof(typeSignatures.TypeSignature)
+        })
+
+        it('includes a function compare', function(){
+            expect(typeSignatures.compare).to.be.a('function')
+        })
+
+        it('includes a function deduce', function(){
+            expect(typeSignatures.deduce).to.be.a('function')
+        })
+    })
+  /*  it("Includes a constructor for an object called 'TypeSignature'", function(){
         expect(typeSignatures.TypeSignature).to.be.a('function')
         let ts = new typeSignatures.TypeSignature(["NUM"]);
         expect(ts).to.be.an('object')
         expect(ts).to.be.an.instanceOf(typeSignatures.TypeSignature)
     })
-    it('includes a function compare', function(){
-        expect(typeSignatures.compare).to.be.a('function')
-    })
-    it('includes a function combine', function(){
-        expect(typeSignatures.combine).to.be.a('function')
-    })
+*/
 })
+
 
 describe('typeSignatures.TypeSignature object', function(){
     let signature = x => new typeSignatures.TypeSignature(x)
-    context('It takes a description as its only construction parameter.', function(){
+    context('Description parameter', function(){
         it('the description can be an array, e.g. [A,B,B] or [A,[B,B]]', function(){
-            let ts = new typeSignatures.TypeSignature(['fdsa'])
+            let ts = typeSignatures.signature({typeDescription:['fdsa']})
+            console.log(ts.contextIndex)
+            let ts2 = typeSignatures.signature({typeDescription:['fdsa']})
+            console.log(ts2.contextIndex)
             expect(ts).to.be.an.instanceOf(typeSignatures.TypeSignature)
+            
         })
         it('the description can be a function, e.g. X => [X,X,X]', function(){
-            let boolSignature = new typeSignatures.TypeSignature(X => [X,X,X])
+            let boolSignature = typeSignatures.signature({typeDescription:X => [X,X,X]})
             expect(boolSignature).to.be.an.instanceOf(typeSignatures.TypeSignature)
         })
     })
-    context('When the description is an array:', function(){
+})
+
+
+describe("Atomic signatures", function(){
+    context('When the constuction description is an array containing one element:', function(){
+        it("an atomic type signature is created", function(){
+            let ts = typeSignatures.signature({typeDescription: ['Behavior']})
+            expect(ts).to.be.an.instanceof(typeSignatures.TypeSignature)
+            expect(ts.category).to.equal(typeSignatures.categories.Atomic)
+        })
+    })
+    it("has a unique contextID", function(){
+        let ts1 = typeSignatures.signature({typeDescription: ['L']})
+        let ts2 = typeSignatures.signature({typeDescription: ["L"]})
+        expect(ts2.contextIndex).to.equal(ts1.contextIndex)
+    }) 
+    it("has a unique contextID", function(){
+        let ts1 = typeSignatures.signature({typeDescription: ['M']})
+        let ts2 = typeSignatures.signature({typeDescription: ["L"]})
+        expect(ts1.contextIndex).to.not.equal(ts2.contextIndex)
+    })
+})
+
+describe("Arrow signatures", function(){
+     context('When the constuction description is an array with more than one element:', function(){
+        it("an arrow type signature is created", function(){
+            let ts = typeSignatures.signature({typeDescription: [1,1]})
+            expect(ts).to.be.an.instanceof(typeSignatures.TypeSignature)
+            expect(ts.category).to.equal(typeSignatures.categories.Arrow)
+        })
+    })
+})
+/*    context('When the description is an array:', function(){
         it("1 element means atomic type, or a reference to a type stored in some other context", function(){
             let ts = new typeSignatures.TypeSignature([1])
             expect(ts).to.not.have.property('isArrowType')
         })
-         it("2 or more elements means an arrow type, so [A,B] means A->B", function(){
-            let tsLeft = new typeSignatures.TypeSignature([1,3])
-            expect(tsLeft).to.have.property('isArrowType')
-            let tsRight = new typeSignatures.TypeSignature([1])
-            expect(tsRight).to.not.have.property('isArrowType')
-        })
+     
         describe("it evaluates to the right", function(){
             it("so [[0,0],0] is not the same as [0,0,0]", function(){
                 let tsLeft = signature([[0,0],0])
@@ -68,29 +110,45 @@ describe('typeSignatures.TypeSignature object', function(){
             expect(ts.isAbstractType).to.eql(true)
 
         })
-    })
-})
+    })*/
+
 
 describe('typeSignatures.compare(tsLeft, tsRight)', function(){
-
-    let signature = function(des){return new typeSignatures.TypeSignature(des)}
     context('it decides if two typeSignatures are the same', function(){
-        it('so [1] is the same as [1]', function(){
-            let ts1 = signature([1])
-            let ts2 = signature([1])
-            expect(typeSignatures.compare(ts1,ts2)).to.eql(typeSignatures.relation.same)
+        it('so A is the same as A', function(){
+            let ts1 = typeSignatures.signature({typeDescription:["A"]})
+            let ts2 = typeSignatures.signature({typeDescription:["A"]})
+
+            expect(typeSignatures.compare(ts1,ts2)).to.eql(typeSignatures.relations.same)
+        }) 
+        it('but B is not the same as A', function(){
+            let ts1 = typeSignatures.signature({typeDescription:["B"]})
+            let ts2 = typeSignatures.signature({typeDescription:["A"]})
+            expect(typeSignatures.compare(ts1,ts2)).to.eql(typeSignatures.relations.different)
         })
+        it("['A','B'] is the same as ['A','B']", function(){
+            let BOOL1 = typeSignatures.signature({typeDescription:['aba','aba']}) 
+            let BOOL2 = typeSignatures.signature({typeDescription: ['aba', 'aba']})
+            expect(typeSignatures.compare(BOOL1, BOOL2)).to.eql(typeSignatures.relations.same)
+        })
+        it("['A','B'] is not the same as ['A','C']", function(){
+            let BOOL1 = typeSignatures.signature({typeDescription:['A','B']}) 
+            let BOOL2 = typeSignatures.signature({typeDescription: ['A', 'C']})
+            expect(typeSignatures.compare(BOOL1, BOOL2)).to.eql(typeSignatures.relations.different)
+        })
+        it('[A,B,C] is the same as [A, [B,C]]', function(){
+            let s1 = typeSignatures.signature({typeDescription:['A',['B','C']]})
+            let s2 = typeSignatures.signature({typeDescription:['A', ['B','C']] })
+            expect(typeSignatures.compare(s1, s2)).to.eql(typeSignatures.relation.same)
+        })
+     })
+})/*
         it("['A','B'] is the same as ['A','B']", function(){
             let BOOL1 = signature(['aba','aba']) 
             let BOOL2 = signature(['aba', 'aba'])
             expect(typeSignatures.compare(BOOL1, BOOL2)).to.eql(typeSignatures.relation.same)
         })
-        it('[A,B,C] is the same as [A, [B,C]]', function(){
-            let s1 = signature(['aba','aba','aba']) 
-            let s2 = signature(['aba', ['aba','aba']])
-            expect(typeSignatures.compare(s1, s2)).to.eql(typeSignatures.relation.same)
-        })
-         it('X => [X,X,X] is the same as Y => [Y, [Y,Y]]', function(){
+        it('X => [X,X,X] is the same as Y => [Y, [Y,Y]]', function(){
             let BOOL1 = signature(X => [X, X, X]) 
             let BOOL2 = signature(Y => [Y, [Y, Y]])
             expect(typeSignatures.compare(BOOL1, BOOL2)).to.eql(typeSignatures.relation.same)
@@ -99,8 +157,6 @@ describe('typeSignatures.compare(tsLeft, tsRight)', function(){
             let BOOL1 = signature(X => [X, X, X]) 
             let BOOL2 = signature(Y => [[Y, Y], Y])
             expect(typeSignatures.compare(BOOL1, BOOL2)).to.not.eql(typeSignatures.relation.same)
-        })
- })
   
   
     it('ABSTRACT 2...', function(){
@@ -144,3 +200,4 @@ describe('typeSignatures::typeSignature.combine(ts1, ts2)', function(){
             same(tsRes, new typeSignatures.TypeSignature([A,A,A])) 
         })
 })
+*/
