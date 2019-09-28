@@ -17,6 +17,7 @@ const context = (function(){
     return{
 
         name : function(objectName){ //returns the index of objectName in the name store
+            expect(objectName).to.be.a('string') 
             if(names.has(objectName)){
                 return names.get(objectName).ID
             }
@@ -31,7 +32,8 @@ const context = (function(){
 
 const typeSignatures = (function(){
     let signature, isSameSignature;
-    isSameSignature = (sLeft, sRight) => typeSignatures.compare(sLeft, sRight) === typeSignatures.relation.same
+    isSameSignature = (sLeft, sRight) => 
+        typeSignatures.compare(sLeft, sRight) === typeSignatures.relations.same
 
     return{
         errors: {
@@ -50,12 +52,20 @@ const typeSignatures = (function(){
         },
 
         signature : function({typeDescription}){
-            if  ( Array.isArray(typeDescription) && 
-                  typeDescription.length === 1  &&
-                  Array.isArray(typeDescription[0]) ) {
-                    return typeSignatures.signature({typeDescription: typeDescription.flat()})
-            }
-            return new typeSignatures.TypeSignature({context, typeDescription})
+            try{
+                if  ( Array.isArray(typeDescription) && 
+                      typeDescription.length === 1  &&
+                      Array.isArray(typeDescription[0]) ) {
+
+                    return typeSignatures.signature({
+                        typeDescription: typeDescription[0]
+                    })
+                }
+                return new typeSignatures.TypeSignature({context, typeDescription})
+          }catch(err){
+            errMsg = err + "@typeSignatures.signature"
+            console.log(errMsg)
+          }
         },
 
         //constructor for type signatures
@@ -76,8 +86,10 @@ const typeSignatures = (function(){
 
             if( Array.isArray(typeDescription) && typeDescription.length > 1){    //ArrowType
                     this.category =   typeSignatures.categories.Arrow
-                    this.left = typeSignatures.signature({typeDescription: [typeDescription[0]]})
-                    this.right = typeSignatures.signature({typeDescription: typeDescription.slice(1)})
+                    this.left = typeSignatures.signature({
+                        typeDescription: [typeDescription[0]]})
+                    this.right = typeSignatures.signature({
+                        typeDescription: typeDescription.slice(1)})
                     return
                 }
         },
@@ -118,24 +130,54 @@ const typeSignatures = (function(){
 
         deduce: function({leftSignature, rightSignature}){
             //returns a signature deduced from the composition of the two argument signature
-            if ( tsLeft.isAbstractType ){
-                return signature(tsLeft.description(tsRight.description))
+            if ( leftSignature.category === typeSignatures.categories.Abstract){
+//                return signature(tsLeft.description(tsRight.description))
             }
             // deduce(A->B, A) returns B
-            if ( (leftSignature.category === typeSignatures.categories.Arrow) && 
-                     isSameSignature( tsLeft.left, tsRight)) {
-                return leftSignature.right
+            if (leftSignature.category === typeSignatures.categories.Arrow){
+                if(isSameSignature(tsLeft.left, tsRight)) {
+                  return leftSignature.right
+                }
             }
         }
     }
 })();
 
-typeSignatures.TypeSignature.prototype ={
-    toString: function(){
-        if(this.category === typeSignatures.categories.Atomic){
-            return this.typeDescription
+/*typeSignatures.TypeSignature.prototype ={
+
+    
+    map: function({atomicCallBack, arrowCallback, abstractCallback}){
+    //calls either function depending on the kind of type this is             
+    //and returns result
+    switch(this.category){
+        case typeSignatures.categories.Atomic:
+            return atomicCallback.bind(this)()
+        case typeSignatures.categories.Arrow: 
+            return arrowCallback.bind(this)()
+        case typeSignatures.categories.Abstract:
+            return abstractCallback.bind(this)()
+       }
+
+    }, */
+
+typeSignatures.TypeSignature.prototype.toString = function(){
+
+  let signatureDescription = ""
+    switch(this.category){
+      case typeSignatures.categories.Atomic:
+                signatureDescription = this.contextIndex
+                break
+            case typeSignatures.categories.Arrow:
+                signatureDescription = 
+                    ['(' + this.left.toString(),
+                    String.fromCharCode(8594), 
+                    this.right.toString() + ')'].join('')
+                    break
+            case typeSignatures.categories.Abstract:
+                signatureDescription = "" 
+                  break
         }
-   }
+    return signatureDescription
 }
 
 module.exports = {
